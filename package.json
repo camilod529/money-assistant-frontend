@@ -3,6 +3,7 @@
     "@expo-google-fonts/jetbrains-mono": "^0.2.3",
     "@expo-google-fonts/noto-sans": "^0.2.3",
     "@expo/vector-icons": "^14.1.0",
+    "@lukeed/uuid": "^2.0.1",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/drawer": "^7.0.0",
     "@react-navigation/elements": "^2.3.8",
@@ -40,7 +41,8 @@
     "react-native-screens": "~4.11.1",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

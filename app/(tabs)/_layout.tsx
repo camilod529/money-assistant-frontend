@@ -24,6 +24,15 @@ export default function _layout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="books"
+        options={{
+          title: Locales.t("books.title"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="book-outline" color={color} size={size} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

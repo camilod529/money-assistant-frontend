@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { InferSelectModel, relations } from "drizzle-orm";
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const book = sqliteTable("book", {
@@ -126,3 +126,6 @@ export const exchangeRateRelations = relations(exchangeRate, ({ one }) => ({
     references: [currency.code],
   }),
 }));
+
+// TYPES
+export type Book = InferSelectModel<typeof book>;

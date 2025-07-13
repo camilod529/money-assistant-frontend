@@ -13,6 +13,13 @@ const English = {
     save: "Save",
     cancel: "Cancel",
   },
+  books: {
+    add: "Add Book",
+    create: "Create a new book",
+    description: "Description",
+    name: "Name",
+    title: "Books",
+  },
   explore: "Explore",
   login: "Log in",
   signup: "Sign up",
