@@ -58,7 +58,7 @@ export default function AccountsScreen() {
         />
       ) : (
         <Text style={{ textAlign: "center", marginTop: 32 }}>
-          No accounts found.
+          {Locales.t("accounts.empty")}
         </Text>
       )}
 

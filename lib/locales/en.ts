@@ -29,6 +29,7 @@ const English = {
     name: "Account Name",
     title: "Accounts",
     type: "Type",
+    empty: "No accounts found.",
     types: {
       CASH: "Cash",
       BANK: "Bank Account",
