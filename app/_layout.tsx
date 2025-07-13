@@ -1,38 +1,128 @@
-import { ThemeProvider, useAppTheme } from "@/contexts/ThemeContext";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import { View } from "react-native";
+import { JetBrainsMono_400Regular } from "@expo-google-fonts/jetbrains-mono";
+import { NotoSans_400Regular } from "@expo-google-fonts/noto-sans";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
-  ActivityIndicator,
-  Provider as PaperProvider,
-} from "react-native-paper";
+  DarkTheme as NavDarkTheme,
+  DefaultTheme as NavLightTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import * as Localization from "expo-localization";
+import { SplashScreen, Stack } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { StatusBar } from "expo-status-bar";
+import * as SystemUI from "expo-system-ui";
+import React, { useEffect, useState } from "react";
+import { Platform, useColorScheme } from "react-native";
+import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
+
+import { Locales, Setting, Themes } from "@/lib";
+
+export { ErrorBoundary } from "expo-router";
+
+export const unstable_settings = { initialRouteName: "(tabs)" };
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    "SpaceMono-Regular": require("../assets/fonts/SpaceMono-Regular.ttf"),
+  const [loaded, error] = useFonts({
+    NotoSans_400Regular,
+    JetBrainsMono_400Regular,
+    ...MaterialCommunityIcons.font,
   });
 
-  if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
   }
-  return (
-    <ThemeProvider>
-      <PaperProviderWrapper />
-    </ThemeProvider>
-  );
+
+  return <RootLayoutNav />;
 }
 
-function PaperProviderWrapper() {
-  const { theme } = useAppTheme();
+const RootLayoutNav = () => {
+  const colorScheme = useColorScheme();
+  console.log({ colorScheme });
+  const [settings, setSettings] = useState<Setting>({
+    theme: "auto",
+    color: "default",
+    language: "auto",
+  });
+
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      SecureStore.getItemAsync("settings").then((result) => {
+        if (result === null) {
+          SecureStore.setItemAsync("settings", JSON.stringify(settings)).then(
+            (res) => console.log(res)
+          );
+        }
+
+        setSettings(JSON.parse(result ?? JSON.stringify(settings)));
+      });
+    } else {
+      setSettings({ ...settings, theme: colorScheme ?? "light" });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (settings.language === "auto") {
+      Locales.locale = Localization.getLocales()[0].languageCode ?? "en";
+    } else {
+      Locales.locale = settings.language;
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const theme =
+    Themes[settings.theme === "auto" ? colorScheme ?? "dark" : settings.theme][
+      settings.color
+    ];
+
+  const { DarkTheme, LightTheme } = adaptNavigationTheme({
+    reactNavigationDark: NavDarkTheme,
+    reactNavigationLight: NavLightTheme,
+    materialDark: Themes.dark[settings.color],
+    materialLight: Themes.light[settings.color],
+  });
+
+  SystemUI.setBackgroundColorAsync(theme.colors.background);
+
   return (
-    <PaperProvider theme={theme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ title: "Money Assistant" }} />
-      </Stack>
-    </PaperProvider>
+    <ThemeProvider
+      value={
+        colorScheme === "light"
+          ? { ...LightTheme, fonts: NavLightTheme.fonts }
+          : { ...DarkTheme, fonts: NavDarkTheme.fonts }
+      }
+    >
+      <PaperProvider theme={theme}>
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+        <Stack />
+        {/* <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="drawer" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="search"
+            options={{ title: Locales.t("search") }}
+          />
+          <Stack.Screen
+            name="modal"
+            options={{ title: Locales.t("titleModal"), presentation: "modal" }}
+          />
+        </Stack> */}
+      </PaperProvider>
+    </ThemeProvider>
   );
-}
+};
