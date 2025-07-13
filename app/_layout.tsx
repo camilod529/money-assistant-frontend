@@ -109,7 +109,10 @@ const RootLayoutNav = () => {
     >
       <PaperProvider theme={theme}>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <Stack />
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
         {/* <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="drawer" options={{ headerShown: false }} />
