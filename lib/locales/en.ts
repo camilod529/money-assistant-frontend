@@ -3,6 +3,17 @@
  */
 
 const English = {
+  home: {
+    title: "Home",
+    welcome: "Welcome!",
+    description: "This screen is powered by React Native Paper.",
+    button: "Press me",
+  },
+  common: {
+    save: "Save",
+    cancel: "Cancel",
+  },
+  explore: "Explore",
   login: "Log in",
   signup: "Sign up",
   profile: "Profile",

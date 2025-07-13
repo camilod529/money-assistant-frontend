@@ -1,3 +1,5 @@
+import { Locales } from "@/lib";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
@@ -7,13 +9,19 @@ export default function _layout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: Locales.t("home.title"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: "Explore",
+          title: Locales.t("explore"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="compass-outline" color={color} size={size} />
+          ),
         }}
       />
     </Tabs>

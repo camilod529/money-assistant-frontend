@@ -1,3 +1,4 @@
+import { Locales, Setting, Themes } from "@/lib";
 import { JetBrainsMono_400Regular } from "@expo-google-fonts/jetbrains-mono";
 import { NotoSans_400Regular } from "@expo-google-fonts/noto-sans";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -12,11 +13,9 @@ import { SplashScreen, Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Platform, useColorScheme } from "react-native";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
-
-import { Locales, Setting, Themes } from "@/lib";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -33,13 +32,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    if (loaded) SplashScreen.hideAsync();
+  }, [error, loaded]);
 
   if (!loaded) {
     return null;
@@ -50,7 +44,6 @@ export default function RootLayout() {
 
 const RootLayoutNav = () => {
   const colorScheme = useColorScheme();
-  console.log({ colorScheme });
   const [settings, setSettings] = useState<Setting>({
     theme: "auto",
     color: "default",
@@ -58,44 +51,45 @@ const RootLayoutNav = () => {
   });
 
   useEffect(() => {
-    if (Platform.OS !== "web") {
-      SecureStore.getItemAsync("settings").then((result) => {
+    const initializeSettings = async () => {
+      if (Platform.OS !== "web") {
+        const result = await SecureStore.getItemAsync("settings");
         if (result === null) {
-          SecureStore.setItemAsync("settings", JSON.stringify(settings)).then(
-            (res) => console.log(res)
-          );
+          await SecureStore.setItemAsync("settings", JSON.stringify(settings));
         }
+        const finalSettings = JSON.parse(result ?? JSON.stringify(settings));
+        setSettings(finalSettings);
 
-        setSettings(JSON.parse(result ?? JSON.stringify(settings)));
-      });
-    } else {
-      setSettings({ ...settings, theme: colorScheme ?? "light" });
-    }
+        Locales.locale =
+          finalSettings.language === "auto"
+            ? Localization.getLocales()[0].languageCode ?? "en"
+            : finalSettings.language;
+      } else {
+        const webSettings = { ...settings, theme: colorScheme ?? "light" };
+        setSettings(webSettings);
+        Locales.locale = Localization.getLocales()[0].languageCode ?? "en";
+      }
+    };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    initializeSettings();
+  }, [colorScheme, settings]);
 
-  useEffect(() => {
-    if (settings.language === "auto") {
-      Locales.locale = Localization.getLocales()[0].languageCode ?? "en";
-    } else {
-      Locales.locale = settings.language;
-    }
+  const theme = useMemo(() => {
+    return Themes[
+      settings.theme === "auto" ? colorScheme ?? "dark" : settings.theme
+    ][settings.color];
+  }, [settings, colorScheme]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const theme =
-    Themes[settings.theme === "auto" ? colorScheme ?? "dark" : settings.theme][
-      settings.color
-    ];
-
-  const { DarkTheme, LightTheme } = adaptNavigationTheme({
-    reactNavigationDark: NavDarkTheme,
-    reactNavigationLight: NavLightTheme,
-    materialDark: Themes.dark[settings.color],
-    materialLight: Themes.light[settings.color],
-  });
+  const { DarkTheme, LightTheme } = useMemo(
+    () =>
+      adaptNavigationTheme({
+        reactNavigationDark: NavDarkTheme,
+        reactNavigationLight: NavLightTheme,
+        materialDark: Themes.dark[settings.color],
+        materialLight: Themes.light[settings.color],
+      }),
+    [settings.color]
+  );
 
   SystemUI.setBackgroundColorAsync(theme.colors.background);
 
@@ -113,18 +107,6 @@ const RootLayoutNav = () => {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        {/* <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="drawer" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="search"
-            options={{ title: Locales.t("search") }}
-          />
-          <Stack.Screen
-            name="modal"
-            options={{ title: Locales.t("titleModal"), presentation: "modal" }}
-          />
-        </Stack> */}
       </PaperProvider>
     </ThemeProvider>
   );

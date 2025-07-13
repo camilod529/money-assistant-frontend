@@ -1,4 +1,5 @@
 // app/index.tsx
+import { Locales } from "@/lib";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Appbar, Button, Card, Text } from "react-native-paper";
@@ -7,17 +8,17 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Appbar.Header>
-        <Appbar.Content title="Home" />
+        <Appbar.Content title={Locales.t("home.title")} />
       </Appbar.Header>
 
       <Card style={styles.card}>
-        <Card.Title title="Welcome!" />
+        <Card.Title title={Locales.t("home.welcome")} />
         <Card.Content>
-          <Text>This screen is powered by React Native Paper.</Text>
+          <Text>{Locales.t("home.description")}</Text>
         </Card.Content>
         <Card.Actions>
           <Button icon="camera" mode="contained" onPress={() => {}}>
-            Press me
+            {Locales.t("home.button")}
           </Button>
         </Card.Actions>
       </Card>
