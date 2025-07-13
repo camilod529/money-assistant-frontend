@@ -26,7 +26,7 @@ export default function BooksScreen() {
             style={{ margin: 8 }}
             onPress={() =>
               router.push({
-                pathname: "/books/[id]",
+                pathname: "/books/[id]/accounts",
                 params: { id: item.id },
               })
             }

@@ -1,72 +1,81 @@
 import { Locales } from "@/lib";
+import { defaultSearchParamsProps } from "@/lib/types/common.types";
 import { useAccountsStore } from "@/store/accounts";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
-import { Button, Card, Text, TextInput } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SectionList, View } from "react-native";
+import { Card, FAB, Text, useTheme } from "react-native-paper";
+import { AccountModal } from "./components/AccountModal";
+import { groupAccountsByType } from "./utils/functions";
 
 export default function AccountsScreen() {
-  const { id } = useLocalSearchParams();
-  const { accounts, loadAccounts, addAccount } = useAccountsStore();
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const { top } = useSafeAreaInsets();
+  const { id } = useLocalSearchParams<defaultSearchParamsProps>();
+  const { accounts, loadAccounts } = useAccountsStore();
+  const [modalVisible, setModalVisible] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
-    if (typeof id === "string") {
-      loadAccounts(id);
-    }
+    loadAccounts(id);
   }, [id, loadAccounts]);
 
+  const groupedAccountSections = groupAccountsByType(accounts);
+
   return (
-    <View style={{ padding: 16, marginTop: top + 5 }}>
-      <FlatList
-        data={accounts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Card style={{ marginVertical: 8 }}>
-            <Card.Title
-              title={item.name}
-              subtitle={`${Locales.t("accounts.type")}: ${item.type}`}
-            />
-            <Card.Content>
-              <Text variant="bodyLarge">
-                {Locales.t("accounts.balance")}: {item.balance}
-              </Text>
-            </Card.Content>
-          </Card>
-        )}
-      />
-      <TextInput
-        label={Locales.t("accounts.name")}
-        value={name}
-        onChangeText={setName}
-        style={{ marginVertical: 8 }}
-      />
-      <TextInput
-        label={Locales.t("accounts.accountType")}
-        value={type}
-        onChangeText={setType}
-        style={{ marginBottom: 16 }}
-      />
-      <Button
-        mode="contained"
-        onPress={() => {
-          if (!name.trim() || !type.trim() || typeof id !== "string") return;
-          addAccount({
-            name,
-            type,
-            bookId: id,
-            currencyCode: "USD",
-            balance: 0,
-          });
-          setName("");
-          setType("");
+    <View style={{ flex: 1, padding: 16 }}>
+      {groupedAccountSections.length > 0 ? (
+        <SectionList
+          sections={groupedAccountSections}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          renderItem={({ item }) => (
+            <Card
+              style={{
+                marginVertical: 6,
+                backgroundColor: theme.colors.elevation.level1,
+              }}
+              mode="elevated"
+            >
+              <Card.Title title={item.name} />
+              <Card.Content>
+                <Text variant="bodyMedium">
+                  {`${Locales.t("accounts.balance")}: ${item.balance}`}
+                </Text>
+              </Card.Content>
+            </Card>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Text
+              variant="titleMedium"
+              style={{
+                marginTop: 16,
+                marginBottom: 8,
+                color: theme.colors.onBackground,
+              }}
+            >
+              {section.title}
+            </Text>
+          )}
+        />
+      ) : (
+        <Text style={{ textAlign: "center", marginTop: 32 }}>
+          No accounts found.
+        </Text>
+      )}
+
+      <FAB
+        icon="plus"
+        onPress={() => setModalVisible(true)}
+        style={{
+          position: "absolute",
+          bottom: 16,
+          right: 16,
         }}
-      >
-        {Locales.t("accounts.add")}
-      </Button>
+      />
+      <AccountModal
+        visible={modalVisible}
+        onDismiss={() => setModalVisible(false)}
+        id={id}
+      />
     </View>
   );
 }

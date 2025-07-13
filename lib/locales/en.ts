@@ -29,6 +29,17 @@ const English = {
     name: "Account Name",
     title: "Accounts",
     type: "Type",
+    types: {
+      CASH: "Cash",
+      BANK: "Bank Account",
+      CREDIT_CARD: "Credit Card",
+      INVESTMENT: "Investment",
+      OTHER: "Other",
+    },
+  },
+  errors: {
+    required: "This field is required",
+    positive: "Value must be positive",
   },
 };
 

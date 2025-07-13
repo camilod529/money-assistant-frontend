@@ -1,5 +1,6 @@
 import { InferSelectModel, relations } from "drizzle-orm";
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { accountTypesList, transactionTypesList } from "./utils/constants";
 
 export const book = sqliteTable("book", {
   id: text("id").primaryKey(),
@@ -21,7 +22,9 @@ export const account = sqliteTable("account", {
     .notNull()
     .references(() => book.id),
   name: text("name").notNull(),
-  type: text("type").notNull(),
+  type: text("type", {
+    enum: accountTypesList,
+  }).notNull(),
   currencyCode: text("currencyCode")
     .notNull()
     .references(() => currency.code),
@@ -36,7 +39,7 @@ export const category = sqliteTable("category", {
     .references(() => book.id),
   name: text("name").notNull(),
   type: text("type", {
-    enum: ["INCOME", "EXPENSE", "ADJUSTMENT", "TRANSFER"],
+    enum: transactionTypesList,
   }).notNull(),
 });
 
