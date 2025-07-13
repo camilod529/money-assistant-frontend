@@ -1,29 +1,29 @@
-import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs'
-import { getHeaderTitle } from '@react-navigation/elements'
-import React from 'react'
+import { BottomTabHeaderProps } from "@react-navigation/bottom-tabs";
+import { getHeaderTitle } from "@react-navigation/elements";
+import React from "react";
 import {
   Appbar,
   AppbarProps,
   Searchbar,
   SearchbarProps,
-} from 'react-native-paper'
+} from "react-native-paper";
 
 interface TabsHeaderProps extends AppbarProps {
-  navProps: BottomTabHeaderProps
-  withSearchBar?: boolean
-  searchBarProps?: SearchbarProps
+  navProps: BottomTabHeaderProps;
+  withSearchBar?: boolean;
+  searchBarProps?: SearchbarProps;
 }
 
 const TabsHeader = (props: TabsHeaderProps) => {
-  const [query, setQuery] = React.useState('')
+  const [query, setQuery] = React.useState("");
 
   React.useEffect(() => {
     if (props.searchBarProps?.onChangeText) {
-      props.searchBarProps.onChangeText(query)
+      props.searchBarProps.onChangeText(query);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query])
+  }, [query]);
 
   return props.withSearchBar ? (
     <Appbar.Header {...props}>
@@ -43,7 +43,7 @@ const TabsHeader = (props: TabsHeaderProps) => {
       <Appbar.Content
         title={getHeaderTitle(
           props.navProps.options,
-          props.navProps.route.name,
+          props.navProps.route.name
         )}
       />
 
@@ -53,7 +53,7 @@ const TabsHeader = (props: TabsHeaderProps) => {
           })
         : undefined}
     </Appbar.Header>
-  )
-}
+  );
+};
 
-export default TabsHeader
+export default TabsHeader;

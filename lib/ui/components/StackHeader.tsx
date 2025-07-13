@@ -1,29 +1,29 @@
-import { getHeaderTitle } from '@react-navigation/elements'
-import { NativeStackHeaderProps } from '@react-navigation/native-stack'
-import React from 'react'
+import { getHeaderTitle } from "@react-navigation/elements";
+import { NativeStackHeaderProps } from "@react-navigation/native-stack";
+import React from "react";
 import {
   Appbar,
   AppbarProps,
   Searchbar,
   SearchbarProps,
-} from 'react-native-paper'
+} from "react-native-paper";
 
 interface StackHeaderProps extends AppbarProps {
-  navProps: NativeStackHeaderProps
-  withSearchbar?: boolean
-  searchBarProps?: SearchbarProps
+  navProps: NativeStackHeaderProps;
+  withSearchbar?: boolean;
+  searchBarProps?: SearchbarProps;
 }
 
 const StackHeader = (props: StackHeaderProps) => {
-  const [query, setQuery] = React.useState('')
+  const [query, setQuery] = React.useState("");
 
   React.useEffect(() => {
     if (props.searchBarProps?.onChangeText) {
-      props.searchBarProps.onChangeText(query)
+      props.searchBarProps.onChangeText(query);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query])
+  }, [query]);
 
   return props.withSearchbar ? (
     <Appbar.Header {...props}>
@@ -51,7 +51,7 @@ const StackHeader = (props: StackHeaderProps) => {
       <Appbar.Content
         title={getHeaderTitle(
           props.navProps.options,
-          props.navProps.route.name,
+          props.navProps.route.name
         )}
       />
 
@@ -61,7 +61,7 @@ const StackHeader = (props: StackHeaderProps) => {
           })
         : undefined}
     </Appbar.Header>
-  )
-}
+  );
+};
 
-export default StackHeader
+export default StackHeader;
