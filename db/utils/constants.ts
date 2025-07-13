@@ -24,3 +24,12 @@ export const accountTypesList = [
   accountTypeValues[0],
   ...accountTypeValues.slice(1),
 ] as const;
+
+export const currencyCodes = ["USD", "COP", "EUR", "MXN"] as const;
+export type CurrencyCode = (typeof currencyCodes)[number];
+export const currencyNames: Record<CurrencyCode, string> = {
+  USD: "US Dollar",
+  COP: "Colombian Peso",
+  EUR: "Euro",
+  MXN: "Mexican Peso",
+};

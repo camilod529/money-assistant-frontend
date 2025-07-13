@@ -1,8 +1,10 @@
 import { account, Account } from "@/db/schema";
 import { db } from "@/lib/db/db";
+import { convertBalance } from "@/lib/utils/accounts/functions";
 import { v4 as uuidv4 } from "@lukeed/uuid";
 import { eq } from "drizzle-orm";
 import { create } from "zustand";
+import { useCurrenciesStore } from "./currencies";
 
 export interface AccountState {
   accounts: Account[];
@@ -41,13 +43,27 @@ export const useAccountsStore = create<AccountState>((set, get) => ({
   updateAccount: async (accountPayload) => {
     console.log("Updating account:", accountPayload);
     try {
+      const existing = get().accounts.find((a) => a.id === accountPayload.id);
+      if (!existing) return;
+
+      let updatedBalance = accountPayload.balance;
+
+      if (existing.currencyCode !== accountPayload.currencyCode) {
+        const currencies = useCurrenciesStore.getState().currencies;
+        updatedBalance = convertBalance({
+          amount: existing.balance,
+          currentCurrencyCode: existing.currencyCode,
+          newCurrencyCode: accountPayload.currencyCode,
+          currencies,
+        });
+      }
       await db
         .update(account)
         .set({
           name: accountPayload.name,
           type: accountPayload.type,
           currencyCode: accountPayload.currencyCode,
-          balance: accountPayload.balance,
+          balance: updatedBalance,
         })
         .where(eq(account.id, accountPayload.id));
       const rows = await db.select().from(account);

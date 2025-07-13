@@ -1,3 +1,4 @@
+import { seedCurrencies } from "@/db/utils/seed";
 import { Locales, Setting, Themes } from "@/lib";
 import { runMigrations } from "@/lib/db/db";
 import { DATABASE_NAME } from "@/lib/utils/constants";
@@ -23,6 +24,7 @@ import {
   adaptNavigationTheme,
   PaperProvider,
 } from "react-native-paper";
+import { useCurrenciesStore } from "../store/currencies";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -36,6 +38,7 @@ export default function RootLayout() {
     JetBrainsMono_400Regular,
     ...MaterialCommunityIcons.font,
   });
+  const { loadCurrencies } = useCurrenciesStore();
 
   useEffect(() => {
     if (error) throw error;
@@ -44,9 +47,12 @@ export default function RootLayout() {
 
   useEffect(() => {
     runMigrations()
-      .then(() => {})
+      .then(() => {
+        seedCurrencies();
+        loadCurrencies();
+      })
       .catch(console.error);
-  }, []);
+  }, [loadCurrencies]);
 
   if (!loaded) {
     return null;

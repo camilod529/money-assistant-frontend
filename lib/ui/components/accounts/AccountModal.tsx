@@ -2,6 +2,7 @@ import { Account } from "@/db/schema";
 import { accountTypeValues } from "@/db/utils/constants";
 import { Locales } from "@/lib";
 import { useAccountsStore } from "@/store/accounts";
+import { useCurrenciesStore } from "@/store/currencies";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 import {
@@ -34,9 +35,13 @@ export function AccountModal({
   accountToEdit,
 }: AccountModalProps) {
   const { addAccount, updateAccount } = useAccountsStore();
-  const [menuVisible, setMenuVisible] = useState(false);
-  const openMenu = () => setMenuVisible(true);
-  const closeMenu = () => setMenuVisible(false);
+  const { currencies } = useCurrenciesStore();
+
+  const [typeMenuVisible, setTypeMenuVisible] = useState(false);
+  const [currencyMenuVisible, setCurrencyMenuVisible] = useState(false);
+
+  const openMenu = () => setTypeMenuVisible(true);
+  const closeMenu = () => setTypeMenuVisible(false);
   const theme = useTheme();
 
   const handleDismiss = () => {
@@ -58,7 +63,6 @@ export function AccountModal({
           ...values,
           id: accountToEdit.id,
           bookId: id,
-          currencyCode: "USD",
         });
         handleDismiss();
         return;
@@ -66,7 +70,6 @@ export function AccountModal({
       addAccount({
         ...values,
         bookId: id,
-        currencyCode: "USD",
         balance: 0,
       });
 
@@ -110,7 +113,7 @@ export function AccountModal({
             <HelperText type="error">{form.errors.balance}</HelperText>
           )}
           <Menu
-            visible={menuVisible}
+            visible={typeMenuVisible}
             onDismiss={closeMenu}
             anchor={
               <Button
@@ -127,7 +130,7 @@ export function AccountModal({
                 key={option}
                 onPress={() => {
                   form.setFieldValue("type", option);
-                  setMenuVisible(false);
+                  setTypeMenuVisible(false);
                 }}
                 title={Locales.t(`accounts.types.${option}`)}
               />
@@ -135,6 +138,36 @@ export function AccountModal({
           </Menu>
           {!!form.errors.type && form.touched.type && (
             <HelperText type="error">{form.errors.type}</HelperText>
+          )}
+          <Menu
+            visible={currencyMenuVisible}
+            onDismiss={() => setCurrencyMenuVisible(false)}
+            anchor={
+              <Button
+                mode="outlined"
+                onPress={() => setCurrencyMenuVisible(true)}
+                style={{ marginBottom: 8 }}
+              >
+                {currencies.find((c) => c.code === form.values.currencyCode)
+                  ?.symbol ?? form.values.currencyCode}
+              </Button>
+            }
+          >
+            {currencies.map((c) => (
+              <Menu.Item
+                key={c.code}
+                onPress={() => {
+                  form.setFieldValue("currencyCode", c.code);
+                  setCurrencyMenuVisible(false);
+                }}
+                title={`${c.symbol} — ${c.code}`}
+              />
+            ))}
+          </Menu>
+          {form.touched.currencyCode && form.errors.currencyCode && (
+            <HelperText type="error">
+              {form.errors.currencyCode as string}
+            </HelperText>
           )}
           <Button
             mode="contained"

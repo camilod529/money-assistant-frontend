@@ -36,7 +36,7 @@ export default function AccountsScreen() {
             <Card style={{ marginVertical: 8 }}>
               <Card.Title
                 title={item.name}
-                subtitle={`Balance: ${item.balance}`}
+                subtitle={`Balance: ${item.balance} ${item.currencyCode}`}
               />
               <Card.Actions>
                 <IconButton
