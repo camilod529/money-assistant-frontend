@@ -24,7 +24,10 @@ import {
   adaptNavigationTheme,
   PaperProvider,
 } from "react-native-paper";
+import { en, registerTranslation } from "react-native-paper-dates";
 import { useCurrenciesStore } from "../store/currencies";
+
+registerTranslation("en", en);
 
 export { ErrorBoundary } from "expo-router";
 

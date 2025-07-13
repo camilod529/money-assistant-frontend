@@ -23,6 +23,15 @@ export default function BooksTabsLayout() {
       }}
     >
       <Tabs.Screen
+        name="transactions/index"
+        options={{
+          title: Locales.t("transactions.title"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="accounts/index"
         options={{
           title: Locales.t("accounts.title"),

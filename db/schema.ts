@@ -134,3 +134,5 @@ export const exchangeRateRelations = relations(exchangeRate, ({ one }) => ({
 export type Book = InferSelectModel<typeof book>;
 export type Account = InferSelectModel<typeof account>;
 export type Currency = InferSelectModel<typeof currency>;
+export type Category = InferSelectModel<typeof category>;
+export type Transaction = InferSelectModel<typeof transaction>;

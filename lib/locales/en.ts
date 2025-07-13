@@ -45,6 +45,19 @@ const English = {
       cancelText: "Cancel",
     },
   },
+  transactions: {
+    title: "Transactions",
+    add: "Add Transaction",
+    selectAccount: "Select Account",
+    selectCategory: "Select Category",
+    amount: "Amount",
+    date: "Date",
+    description: "Description",
+    errors: {
+      required: "%{field} is required",
+      positive: "Amount must be positive",
+    },
+  },
   errors: {
     required: "This field is required",
     positive: "Value must be positive",
