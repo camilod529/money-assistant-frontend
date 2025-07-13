@@ -8,7 +8,7 @@ export interface AccountState {
   accounts: Account[];
   loadAccounts: (bookId: string) => Promise<void>;
   addAccount: (account: Omit<Account, "id" | "createdAt">) => Promise<void>;
-  updateAccount: (account: Account) => Promise<void>;
+  updateAccount: (account: Omit<Account, "createdAt">) => Promise<void>;
   deleteAccount: (accountId: string) => Promise<void>;
   getAccountById: (accountId: string) => Account | undefined;
 }

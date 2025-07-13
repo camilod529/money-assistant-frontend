@@ -23,6 +23,7 @@ const English = {
   accounts: {
     accountType: "Account Type",
     add: "Add Account",
+    edit: "Edit Account",
     balance: "Balance",
     create: "Create a new account",
     currency: "Currency Code",
@@ -36,6 +37,12 @@ const English = {
       CREDIT_CARD: "Credit Card",
       INVESTMENT: "Investment",
       OTHER: "Other",
+    },
+    deleteDialog: {
+      title: "Delete Account",
+      message: 'Are you sure you want to delete "%{name}"?',
+      confirmText: "Delete",
+      cancelText: "Cancel",
     },
   },
   errors: {

@@ -1,3 +1,4 @@
+import { Account } from "@/db/schema";
 import { accountTypeValues } from "@/db/utils/constants";
 import { Locales } from "@/lib";
 import { useAccountsStore } from "@/store/accounts";
@@ -17,40 +18,65 @@ import {
   AccountFormValues,
   accountValidationSchema,
   initialAccountValues,
-} from "../utils/form";
+} from "../../../utils/accounts/form";
 
 interface AccountModalProps {
   visible: boolean;
   onDismiss: () => void;
   id: string;
+  accountToEdit: Account | null;
 }
 
-export function AccountModal({ visible, onDismiss, id }: AccountModalProps) {
-  const { addAccount } = useAccountsStore();
+export function AccountModal({
+  visible,
+  onDismiss,
+  id,
+  accountToEdit,
+}: AccountModalProps) {
+  const { addAccount, updateAccount } = useAccountsStore();
   const [menuVisible, setMenuVisible] = useState(false);
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
   const theme = useTheme();
 
+  const handleDismiss = () => {
+    form.resetForm();
+    onDismiss();
+    closeMenu();
+  };
+
+  console.log("AccountModal - accountToEdit:", accountToEdit);
+
   const form = useFormik<AccountFormValues>({
-    initialValues: initialAccountValues,
+    initialValues: accountToEdit ?? initialAccountValues,
     validationSchema: accountValidationSchema,
     onSubmit: (values) => {
       if (typeof id !== "string") return;
+
+      if (accountToEdit) {
+        updateAccount({
+          ...values,
+          id: accountToEdit.id,
+          bookId: id,
+          currencyCode: "USD",
+        });
+        handleDismiss();
+        return;
+      }
       addAccount({
         ...values,
         bookId: id,
         currencyCode: "USD",
         balance: 0,
       });
-      form.resetForm();
-      onDismiss();
-      closeMenu();
+
+      handleDismiss();
     },
   });
+
   return (
     <Portal>
-      <Modal visible={visible} onDismiss={onDismiss}>
+      <Modal visible={visible} onDismiss={handleDismiss}>
         <Surface
           style={{
             margin: 20,
@@ -115,7 +141,9 @@ export function AccountModal({ visible, onDismiss, id }: AccountModalProps) {
             onPress={() => form.handleSubmit()}
             style={{ marginTop: 16 }}
           >
-            {Locales.t("accounts.add")}
+            {accountToEdit
+              ? Locales.t("accounts.edit")
+              : Locales.t("accounts.add")}
           </Button>
         </Surface>
       </Modal>
