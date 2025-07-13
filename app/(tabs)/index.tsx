@@ -1,10 +1,15 @@
 // app/index.tsx
 import { Locales } from "@/lib";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { useSQLiteContext } from "expo-sqlite";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Appbar, Button, Card, Text } from "react-native-paper";
 
 export default function HomeScreen() {
+  const sqliteDatabase = useSQLiteContext();
+  useDrizzleStudio(sqliteDatabase);
+
   return (
     <View style={styles.container}>
       <Appbar.Header>
