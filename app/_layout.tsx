@@ -1,4 +1,6 @@
 import { Locales, Setting, Themes } from "@/lib";
+import { runMigrations } from "@/lib/db/db";
+import { DATABASE_NAME } from "@/lib/utils/constants";
 import { JetBrainsMono_400Regular } from "@expo-google-fonts/jetbrains-mono";
 import { NotoSans_400Regular } from "@expo-google-fonts/noto-sans";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,11 +13,16 @@ import { useFonts } from "expo-font";
 import * as Localization from "expo-localization";
 import { SplashScreen, Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { Platform, useColorScheme } from "react-native";
-import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
+import {
+  ActivityIndicator,
+  adaptNavigationTheme,
+  PaperProvider,
+} from "react-native-paper";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -35,11 +42,27 @@ export default function RootLayout() {
     if (loaded) SplashScreen.hideAsync();
   }, [error, loaded]);
 
+  useEffect(() => {
+    runMigrations()
+      .then(() => {})
+      .catch(console.error);
+  }, []);
+
   if (!loaded) {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <Suspense fallback={<ActivityIndicator size="large" color="blue" />}>
+      <SQLiteProvider
+        databaseName={DATABASE_NAME}
+        options={{ enableChangeListener: true }}
+        useSuspense
+      >
+        <RootLayoutNav />
+      </SQLiteProvider>
+    </Suspense>
+  );
 }
 
 const RootLayoutNav = () => {
