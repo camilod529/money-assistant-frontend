@@ -1,12 +1,13 @@
 import { Account } from "@/db/schema";
 import { Locales } from "@/lib";
 import { defaultSearchParamsProps } from "@/lib/types/common.types";
+import { AccountList } from "@/lib/ui/components/accounts/AccountList";
 import { AlertDialog } from "@/lib/ui/components/AlertDialog";
 import { useAccountsStore } from "@/store/accounts";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { SectionList, View } from "react-native";
-import { Card, FAB, IconButton, Text, useTheme } from "react-native-paper";
+import { View } from "react-native";
+import { FAB, Text } from "react-native-paper";
 import { AccountModal } from "../../../../lib/ui/components/accounts/AccountModal";
 import { groupAccountsByType } from "../../../../lib/utils/accounts/functions";
 
@@ -17,7 +18,6 @@ export default function AccountsScreen() {
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
-  const theme = useTheme();
 
   useEffect(() => {
     loadAccounts(id);
@@ -28,46 +28,16 @@ export default function AccountsScreen() {
   return (
     <View style={{ flex: 1, padding: 16 }}>
       {groupedAccountSections.length > 0 ? (
-        <SectionList
-          sections={groupedAccountSections}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 80 }}
-          renderItem={({ item }) => (
-            <Card style={{ marginVertical: 8 }}>
-              <Card.Title
-                title={item.name}
-                subtitle={`Balance: ${item.balance} ${item.currencyCode}`}
-              />
-              <Card.Actions>
-                <IconButton
-                  icon="pencil"
-                  onPress={() => {
-                    setEditingAccount(item);
-                    setModalVisible(true);
-                  }}
-                />
-                <IconButton
-                  icon="trash-can"
-                  onPress={() => {
-                    setAccountToDelete(item);
-                    setDeleteDialogVisible(true);
-                  }}
-                />
-              </Card.Actions>
-            </Card>
-          )}
-          renderSectionHeader={({ section }) => (
-            <Text
-              variant="titleMedium"
-              style={{
-                marginTop: 16,
-                marginBottom: 8,
-                color: theme.colors.onBackground,
-              }}
-            >
-              {section.title}
-            </Text>
-          )}
+        <AccountList
+          groupedAccountSections={groupedAccountSections}
+          editButtonPressHandler={(account) => () => {
+            setEditingAccount(account);
+            setModalVisible(true);
+          }}
+          deleteButtonPressHandler={(account) => () => {
+            setAccountToDelete(account);
+            setDeleteDialogVisible(true);
+          }}
         />
       ) : (
         <Text style={{ textAlign: "center", marginTop: 32 }}>
