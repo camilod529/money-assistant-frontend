@@ -25,7 +25,6 @@ import {
   PaperProvider,
 } from "react-native-paper";
 import { en, registerTranslation } from "react-native-paper-dates";
-import { useCurrenciesStore } from "../store/currencies";
 
 registerTranslation("en", en);
 
@@ -41,7 +40,6 @@ export default function RootLayout() {
     JetBrainsMono_400Regular,
     ...MaterialCommunityIcons.font,
   });
-  const { loadCurrencies } = useCurrenciesStore();
 
   useEffect(() => {
     if (error) throw error;
@@ -49,13 +47,8 @@ export default function RootLayout() {
   }, [error, loaded]);
 
   useEffect(() => {
-    runMigrations()
-      .then(() => {
-        seedCurrencies();
-        loadCurrencies();
-      })
-      .catch(console.error);
-  }, [loadCurrencies]);
+    runMigrations().then(seedCurrencies).catch(console.error);
+  }, []);
 
   if (!loaded) {
     return null;
