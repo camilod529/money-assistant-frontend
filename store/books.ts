@@ -7,17 +7,16 @@ export interface BookState {
   books: Book[];
   loadBooks: () => Promise<void>;
   addBook: (book: Omit<Book, "id" | "createdAt">) => Promise<void>;
+  getBookById: (id: string) => Book | undefined;
 }
 
-export const useBooksStore = create<BookState>((set) => ({
+export const useBooksStore = create<BookState>((set, get) => ({
   books: [],
-
   loadBooks: async () => {
     const rows = await db.select().from(book);
     console.log("Loaded books:", rows);
     set({ books: rows });
   },
-
   addBook: async (bookPayload) => {
     console.log("Adding book:", bookPayload);
     try {
@@ -32,5 +31,9 @@ export const useBooksStore = create<BookState>((set) => ({
     } catch (error) {
       console.error("Error adding book:", error);
     }
+  },
+  getBookById: (id) => {
+    const book = get().books.find((b) => b.id === id);
+    return book;
   },
 }));

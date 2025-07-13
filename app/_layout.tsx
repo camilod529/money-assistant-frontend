@@ -127,7 +127,14 @@ const RootLayoutNav = () => {
       <PaperProvider theme={theme}>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="books/[id]"
+            options={{
+              //  headerShown: false,
+              title: Locales.t("books.title"),
+            }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
       </PaperProvider>
