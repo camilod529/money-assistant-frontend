@@ -133,7 +133,6 @@ const RootLayoutNav = () => {
           <Stack.Screen
             name="books/[id]"
             options={{
-              //  headerShown: false,
               title: Locales.t("books.title"),
             }}
           />

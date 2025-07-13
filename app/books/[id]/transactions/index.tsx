@@ -1,4 +1,5 @@
 import { defaultSearchParamsProps } from "@/lib/types/common.types";
+import { TransactionsByDateModal } from "@/lib/ui/components/transactions/TransactionByDayModal";
 import { TransactionModal } from "@/lib/ui/components/transactions/TransactionModal";
 import { useTransactionsStore } from "@/store/transactions";
 import { useLocalSearchParams } from "expo-router";
@@ -10,14 +11,40 @@ import { FAB, useTheme } from "react-native-paper";
 export default function TransactionsScreen() {
   const theme = useTheme();
   const { id } = useLocalSearchParams<defaultSearchParamsProps>();
-  const { transactions, loadTransactionsByBook } = useTransactionsStore();
-
+  const loadTransactionsByBook = useTransactionsStore(
+    (state) => state.loadTransactionsByBook
+  );
+  const transactions = useTransactionsStore((state) => state.transactions);
+  const [intermediateModalVisible, setIntermediateModalVisible] =
+    useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
 
-  console.log(selectedDate);
-  const [modalVisible, setModalVisible] = useState(false);
+  const markedDates = transactions.reduce<Record<string, any>>(
+    (acc, transaction) => {
+      const date = transaction.transactionAt.toISOString().split("T")[0];
+      acc[date] = {
+        marked: true,
+        dotColor: theme.colors.onPrimary,
+        selected: date === selectedDate,
+        selectedColor: theme.colors.primary,
+      };
+      return acc;
+    },
+    {}
+  );
+
+  if (!markedDates[selectedDate]) {
+    markedDates[selectedDate] = {
+      selected: true,
+      selectedColor: theme.colors.primary,
+    };
+  } else {
+    markedDates[selectedDate].selected = true;
+    markedDates[selectedDate].selectedColor = theme.colors.primary;
+  }
 
   useEffect(() => {
     if (id) {
@@ -44,15 +71,10 @@ export default function TransactionsScreen() {
           monthTextColor: theme.colors.onBackground,
           indicatorColor: theme.colors.primary,
         }}
-        markedDates={{
-          [selectedDate]: {
-            selected: true,
-            selectedColor: theme.colors.primary,
-          },
-        }}
+        markedDates={markedDates}
         onDayPress={(day: DateData) => {
           setSelectedDate(day.dateString);
-          setModalVisible(true);
+          setIntermediateModalVisible(true);
         }}
       />
 
@@ -62,6 +84,20 @@ export default function TransactionsScreen() {
         onPress={() => {
           setSelectedDate(new Date().toISOString().split("T")[0]);
           setModalVisible(true);
+        }}
+      />
+      <TransactionsByDateModal
+        visible={intermediateModalVisible}
+        onDismiss={() => setIntermediateModalVisible(false)}
+        selectedDate={selectedDate}
+        bookId={id}
+        onCreate={() => {
+          setIntermediateModalVisible(false);
+          setModalVisible(true);
+        }}
+        onSelectTransaction={(transaction) => {
+          setIntermediateModalVisible(false);
+          // open edit modal here
         }}
       />
       <TransactionModal

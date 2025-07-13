@@ -53,6 +53,9 @@ const English = {
     amount: "Amount",
     date: "Date",
     description: "Description",
+    transactionsFor: "Transactions for %{date}",
+    noTransactions: "No transactions for this date",
+    noDescription: "No description",
     errors: {
       required: "%{field} is required",
       positive: "Amount must be positive",

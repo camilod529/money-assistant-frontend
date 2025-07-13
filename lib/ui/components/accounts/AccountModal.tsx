@@ -50,8 +50,6 @@ export function AccountModal({
     closeMenu();
   };
 
-  console.log("AccountModal - accountToEdit:", accountToEdit);
-
   const form = useFormik<AccountFormValues>({
     initialValues: accountToEdit ?? initialAccountValues,
     validationSchema: accountValidationSchema,

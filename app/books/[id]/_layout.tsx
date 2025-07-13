@@ -10,7 +10,7 @@ export default function BooksTabsLayout() {
   const { id } = useLocalSearchParams<defaultSearchParamsProps>();
   const navigation = useNavigation();
   const { getBookById } = useBooksStore();
-  const book = getBookById(id as string);
+  const book = getBookById(id);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -27,6 +27,7 @@ export default function BooksTabsLayout() {
       >
         <Tabs.Screen
           name="transactions/index"
+          initialParams={{ id }}
           options={{
             title: Locales.t("transactions.title"),
             tabBarIcon: ({ color, size }) => (
@@ -36,6 +37,7 @@ export default function BooksTabsLayout() {
         />
         <Tabs.Screen
           name="accounts/index"
+          initialParams={{ id }}
           options={{
             title: Locales.t("accounts.title"),
             tabBarIcon: ({ color, size }) => (

@@ -7,8 +7,9 @@ import { useAccountsStore } from "@/store/accounts";
 import { useCategoriesStore } from "@/store/categories";
 import { useTransactionsStore } from "@/store/transactions";
 import { useFormik } from "formik";
-import React, { FC, useState } from "react";
-import { ScrollView, View } from "react-native";
+import React, { FC, useRef, useState } from "react";
+import { TextInput as RNTextInput, ScrollView, View } from "react-native";
+
 import {
   Button,
   HelperText,
@@ -41,6 +42,8 @@ export const TransactionModal: FC<TransactionModalProps> = ({
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [categoryMenuVisible, setCategoryMenuVisible] = useState(false);
   const [timeVisible, setTimeVisible] = useState(false);
+  const amountRef = useRef<RNTextInput>(null);
+
   const now = new Date();
   const [year, month, day] = selectedDate.split("-").map(Number);
   const transactionDate = new Date(
@@ -86,13 +89,17 @@ export const TransactionModal: FC<TransactionModalProps> = ({
             backgroundColor: theme.colors.background,
             borderRadius: theme.roundness * 2,
             elevation: 4,
+            maxHeight: "90%",
           }}
         >
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             <Text
               variant="titleMedium"
               style={{
-                marginBottom: 24, // Increased from 16
+                marginBottom: 24,
                 color: theme.colors.onBackground,
               }}
             >
@@ -107,7 +114,7 @@ export const TransactionModal: FC<TransactionModalProps> = ({
                 <Button
                   mode="outlined"
                   onPress={() => setAccountMenuVisible(true)}
-                  style={{ marginBottom: 8 }} // Increased from 4
+                  style={{ marginBottom: 8 }}
                 >
                   {accounts.find((a) => a.id === form.values.accountId)?.name ??
                     Locales.t("transactions.selectAccount")}
@@ -140,7 +147,7 @@ export const TransactionModal: FC<TransactionModalProps> = ({
                   <Button
                     mode="outlined"
                     onPress={() => setCategoryMenuVisible(true)}
-                    style={{ marginBottom: 8 }} // Increased from 4
+                    style={{ marginBottom: 8 }}
                   >
                     {categories.find((c) => c.id === form.values.categoryId)
                       ?.name ?? Locales.t("transactions.selectCategory")}
@@ -168,6 +175,7 @@ export const TransactionModal: FC<TransactionModalProps> = ({
             {/* Amount */}
             <View style={{ marginTop: 16 }}>
               <TextInput
+                ref={amountRef}
                 label={Locales.t("transactions.amount")}
                 keyboardType="numeric"
                 value={form.values.amount?.toString()}
@@ -176,7 +184,18 @@ export const TransactionModal: FC<TransactionModalProps> = ({
                 }
                 onBlur={form.handleBlur("amount")}
                 error={form.touched.amount && !!form.errors.amount}
-                style={{ marginBottom: 8 }} // Increased from 4
+                style={{ marginBottom: 8 }}
+                onFocus={() => {
+                  if (amountRef.current) {
+                    const value = form.values.amount?.toString() ?? "";
+                    amountRef.current.setNativeProps({
+                      selection: {
+                        start: 0,
+                        end: value.length,
+                      },
+                    });
+                  }
+                }}
               />
               {!!form.errors.amount && form.touched.amount && (
                 <HelperText type="error" style={{ marginBottom: 8 }}>
@@ -193,7 +212,7 @@ export const TransactionModal: FC<TransactionModalProps> = ({
                 value={form.values.transactionAt}
                 onChange={(date) => form.setFieldValue("transactionAt", date)}
                 inputMode="start"
-                style={{ marginBottom: 16 }} // Added margin
+                style={{ marginBottom: 16 }}
               />
             </View>
 
@@ -231,14 +250,14 @@ export const TransactionModal: FC<TransactionModalProps> = ({
                 value={form.values.description}
                 onChangeText={form.handleChange("description")}
                 onBlur={form.handleBlur("description")}
-                style={{ marginBottom: 24 }} // Increased from 16
+                style={{ marginBottom: 24 }}
               />
             </View>
 
             <Button
               mode="contained"
               onPress={() => form.handleSubmit()}
-              style={{ paddingVertical: 8, marginTop: 8 }} // Added margin
+              style={{ paddingVertical: 8, marginTop: 8 }}
             >
               {Locales.t("transactions.add")}
             </Button>
